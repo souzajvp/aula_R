@@ -13,3 +13,6 @@ chagas <- read.csv("dados/chagas_00_19.csv")
 # Esse é o caminho completo para o mesmo arquivo. Os dois métodos vao dar o mesmo resultado!!!
 # No caso de vocês, pode ser que vcs precisem usar o caminho completo
 chagas <- read.csv("/Users/jps89/Documents/GEMINI/aula_R/dados/chagas_00_19.csv")
+
+
+######### Insiram o código de vocês para renomear, selecionar e filtrar os dados a partir daqui
