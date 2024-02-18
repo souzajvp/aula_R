@@ -92,14 +92,67 @@ summary(numeros)
 # Recodificando a variável 'sexo' para categorias mais descritivas e adicionando uma nova coluna ao dataframe
 chagas <- chagas %>%
   mutate(sexo_categoria = recode(CS_SEXO, "F" = "Feminino", "M" = "Masculino", "I" = "Indeterminado"),
-    banco = "Chagas DataSUS 2000-2019")  # Adicionando uma coluna constante para identificar a fonte dos dados
+         banco = "Chagas DataSUS 2000-2019")  # Adicionando uma coluna constante para identificar a fonte dos dados
 
 
 # menino, garoto, rapaz, homem -> "Masculino"
 # "menino" = "Masculino", "garoto" = "Masculino"...
 
-# Atividade ---------------------------------------------------------------
+# Quais os resultados dos exames que foram feitos para o diagnóstico  -------------------------------------------------------------------------
 
-colnames(chagas)
+variavel <- ifelse(is.na(chagas$EXAME), "Vazio", "Preenchido")
+# Existe valores faltantes na variável
+chagas$EXAME
 
-chagas$CS_ZONA
+is.na(chagas$EXAME)
+
+table(is.na(chagas$EXAME))
+
+table(variavel)
+
+table(chagas$EXAME, useNA = "always")
+
+chagas <- chagas %>% 
+  mutate(EXAME = recode(EXAME, "1"="Positivo", "2"="Negativo", "3"="Não realizado",
+                        "9" = "Ignorado"))
+
+table(chagas$EXAME)
+prop.table(table(chagas$EXAME)) * 100
+
+
+## ELISA IGM S1 ------------------------------------------------------------
+chagas$ELI_IGM_S1
+
+table(chagas$ELI_IGM_S1, useNA = "always")
+
+chagas <- chagas %>% 
+  mutate(ELI_IGM_S1 = recode(ELI_IGM_S1, "1"="Reagente",  "2" = "Não-reagente",
+                             "3" = "Inconclusivo", "4"="Não realizado"))
+
+table(chagas$ELI_IGM_S1, useNA = "always")
+
+table(chagas$ELI_IGM_S1, chagas$EXAME)
+prop.table(table(chagas$ELI_IGM_S1, chagas$EXAME))
+
+
+# Os individuos sao infectados no mesmo municipio que vivem? --------------
+# COMUNINF - Provavel municipio da infecacao
+# ID_MN_RESI - Municipio de residencia
+
+chagas$ID_MN_RESI == chagas$COMUNINF
+
+table(chagas$ID_MN_RESI == chagas$COMUNINF, useNA = "always")
+
+# Preenchimento das variaveis separadamente
+table(chagas$COMUNINF, useNA = "always")
+
+# Não conseguimos responder essa pergunta de forma satifatória pois os dados de local de infecção não tem bom preenchimento.
+
+# Quantos casos por estado nós tivemos? -----------------------------------
+chagas %>% 
+  mutate(SG_UF = recode(SG_UF, "15"="PA", "16"="AP")) %>%
+  group_by(SG_UF, CS_SEXO) %>% 
+  summarize(n_casos = n(),
+            media_idade = mean(idade_anos, na.rm=T)) %>% 
+  arrange(CS_SEXO, desc(n_casos))
+
